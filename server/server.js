@@ -45,6 +45,9 @@ app.post('/api/quotes', upload.single('artwork'), async (req, res) => {
     res.status(500).json({ message: 'Something went wrong on our side. Please call us instead.' });
   }
 });
+const clientDist = path.join(__dirname, '..', 'client', 'dist');
+app.use(express.static(clientDist));
+app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 
 app.use((err, _req, res, _next) => res.status(400).json({ message: err.message }));
 
