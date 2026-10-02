@@ -8,6 +8,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
+mongoose.set('bufferCommands', false);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -52,6 +53,12 @@ app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 app.use((err, _req, res, _next) => res.status(400).json({ message: err.message }));
 
 const port = process.env.PORT || 5000;
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => app.listen(port, () => console.log('API running on port ' + port)))
-  .catch(e => { console.error('MongoDB connection failed:', e.message); process.exit(1); });
+app.listen(port, () => console.log('Server running on port ' + port));
+
+if (process.env.MONGO_URI) {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(e => console.error('MongoDB connection failed:', e.message));
+} else {
+  console.log('MONGO_URI not set. Running without a database.');
+}
